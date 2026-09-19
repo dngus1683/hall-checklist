@@ -9,10 +9,12 @@
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6; }
-        .input-field { width: 100%; padding: 0.5rem; border-radius: 0.375rem; border: 1px solid #d1d5db; margin-top: 0.25rem; font-size: 16px; }
-        .checkbox-label { display: flex; align-items: center; space-x: 0.5rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
-        .checkbox-input { width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f9fafb; }
+        .input-field { width: 100%; padding: 0.6rem; border-radius: 0.375rem; border: 1px solid #d1d5db; margin-top: 0.25rem; font-size: 15px; background-color: #ffffff;}
+        .input-field:focus { outline: none; border-color: #ec4899; box-shadow: 0 0 0 1px #ec4899; }
+        .section-title { color: #db2777; font-weight: 700; border-bottom: 2px solid #fce7f3; padding-bottom: 0.5rem; margin-bottom: 1rem; margin-top: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        .label-text { display: block; font-size: 0.875rem; font-weight: 600; color: #4b5563; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
     </style>
 </head>
 <body>
@@ -21,30 +23,60 @@
         const { useState, useEffect } = React;
 
         const initialHallData = {
-            id: Date.now(),
+            id: null,
             name: '',
             tourDate: '',
-            // 1. 기본/교통/주차
+            consultant: '',
+            
+            // 1. 위치 및 교통
+            location: '',
             subway: '',
+            busAndShuttle: '',
             parkingCapacity: '',
+            parkingTime: '',
             parkingFee: '',
-            atmInfo: '',
+            atmAndElevator: '',
+
             // 2. 홀 컨디션
-            hallType: '', // 어두운홀/밝은홀
+            hallType: '', // 단독홀/분리/동시
+            atmosphere: '', // 어두움/밝음/채플 등
             ceilingHeight: '',
+            virginRoad: '', // 길이 및 단차
             seatCount: '',
-            bridalRoom: '', // 동선, 화장실 여부
-            // 3. 식사
-            foodType: '', // 뷔페/코스/한상차림
+            ceremonyInterval: '', // 예식 간격 (ex: 90분)
+            screenAndSound: '',
+            mixedGuests: '', // 혼잡도 및 하객 섞임 여부
+
+            // 3. 신부대기실 & 부대시설
+            bridalRoomSpace: '',
+            bridalRoomLight: '',
+            bridalRoomToilet: '', // 전용 화장실
+            bridalRoomPath: '', // 홀 이동 동선
+            lobbySpace: '',
+            paebaek: '', // 폐백실 위치 및 수모비
+
+            // 4. 연회장 및 식사
+            foodType: '', // 뷔페/코스/한상
+            diningRoomFloor: '', // 연회장 위치 (동선)
             diningRoomCapacity: '',
-            tastingReview: '',
-            // 4. 견적 (비용)
+            mealTime: '', // 이용 시간 (ex: 예식 30분 전 ~ 2시간)
+            drinkIncluded: '', // 음주류 포함 여부
+            kidsMeal: '', // 소인 식대
+
+            // 5. 견적 (비용 및 계산)
             guarantee: '', // 보증인원
-            rentalFee: '', // 대관료
-            foodPrice: '', // 식대
-            totalEstimate: '', // 총 견적
-            perks: '', // 당일 혜택 등
-            // 5. 총평
+            
+            rentalFeeOriginal: '', // 대관료 정가
+            rentalFeeDiscount: '', // 대관료 할인가 (적용)
+            
+            foodPriceOriginal: '', // 식대 정가
+            foodPriceDiscount: '', // 식대 할인가 (적용)
+            
+            deposit: '', // 계약금
+            cancelPolicy: '', // 위약금 규정
+            perks: '', // 당일 혜택 / 서비스
+            
+            // 6. 총평
             rating: 3,
             notes: ''
         };
@@ -52,34 +84,31 @@
         function App() {
             const [halls, setHalls] = useState([]);
             const [currentView, setCurrentView] = useState('list'); // 'list' or 'detail'
-            const [activeHall, setActiveHall] = useState(null);
+            const [activeHall, setActiveHall] = useState({ ...initialHallData });
 
-            // 로컬 스토리지에서 데이터 불러오기
             useEffect(() => {
-                const savedData = localStorage.getItem('weddingHalls');
+                const savedData = localStorage.getItem('weddingHalls_v2');
                 if (savedData) {
                     setHalls(JSON.parse(savedData));
                 }
             }, []);
 
-            // 데이터 저장하기
             const saveToLocal = (data) => {
-                localStorage.setItem('weddingHalls', JSON.stringify(data));
+                localStorage.setItem('weddingHalls_v2', JSON.stringify(data));
             };
 
             const handleAddHall = () => {
-                const newHall = { ...initialHallData, id: Date.now() };
-                setActiveHall(newHall);
+                setActiveHall({ ...initialHallData, id: Date.now() });
                 setCurrentView('detail');
             };
 
             const handleEditHall = (hall) => {
-                setActiveHall(hall);
+                setActiveHall({ ...hall });
                 setCurrentView('detail');
             };
 
             const handleDelete = (id) => {
-                if(window.confirm('정말 삭제하시겠습니까?')) {
+                if(window.confirm('이 웨딩홀의 모든 기록을 삭제하시겠습니까?')) {
                     const updatedHalls = halls.filter(h => h.id !== id);
                     setHalls(updatedHalls);
                     saveToLocal(updatedHalls);
@@ -87,16 +116,16 @@
             };
 
             const handleChange = (e) => {
-                const { name, value, type, checked } = e.target;
-                setActiveHall({
-                    ...activeHall,
-                    [name]: type === 'checkbox' ? checked : value
-                });
+                const { name, value } = e.target;
+                setActiveHall(prev => ({
+                    ...prev,
+                    [name]: value
+                }));
             };
 
             const handleSave = () => {
                 if(!activeHall.name) {
-                    alert('웨딩홀 이름을 입력해주세요.');
+                    alert('웨딩홀 이름을 필수로 입력해주세요.');
                     return;
                 }
                 
@@ -111,44 +140,81 @@
                 setHalls(updatedHalls);
                 saveToLocal(updatedHalls);
                 setCurrentView('list');
+                window.scrollTo(0, 0);
+            };
+
+            // 자동 계산 로직
+            const calculateTotal = () => {
+                const g = Number(activeHall.guarantee) || 0;
+                const f = Number(activeHall.foodPriceDiscount) || 0;
+                const r = Number(activeHall.rentalFeeDiscount) || 0;
+                return (g * f) + r;
+            };
+
+            const formatMoney = (num) => {
+                return num ? num.toLocaleString() + '원' : '0원';
             };
 
             if (currentView === 'list') {
                 return (
-                    <div className="max-w-md mx-auto min-h-screen bg-gray-50 pb-20">
+                    <div className="max-w-md mx-auto min-h-screen bg-gray-50 pb-24">
                         <header className="bg-pink-500 text-white p-4 sticky top-0 z-10 shadow-md">
-                            <h1 className="text-xl font-bold text-center">우리의 웨딩홀 투어 💍</h1>
+                            <h1 className="text-xl font-bold text-center">웨딩홀 투어 마스터 💍</h1>
                         </header>
                         
                         <div className="p-4 space-y-4">
                             {halls.length === 0 ? (
-                                <div className="text-center text-gray-500 py-10">
-                                    <p>아직 등록된 웨딩홀이 없습니다.</p>
-                                    <p>아래 버튼을 눌러 투어 기록을 시작하세요!</p>
+                                <div className="text-center text-gray-500 py-16 px-4 bg-white rounded-xl shadow-sm border border-gray-100">
+                                    <span className="text-4xl block mb-3">📝</span>
+                                    <p className="font-semibold text-lg text-gray-700">기록된 웨딩홀이 없습니다.</p>
+                                    <p className="text-sm mt-1">우측 하단 버튼을 눌러 새 투어를 기록해보세요!</p>
                                 </div>
                             ) : (
-                                halls.map(hall => (
-                                    <div key={hall.id} className="bg-white p-4 rounded-xl shadow border border-gray-100">
-                                        <div className="flex justify-between items-center mb-2">
-                                            <h2 className="text-lg font-bold text-gray-800">{hall.name}</h2>
-                                            <span className="text-sm text-pink-500 font-semibold">{hall.rating}점</span>
+                                halls.map(hall => {
+                                    const g = Number(hall.guarantee) || 0;
+                                    const f = Number(hall.foodPriceDiscount) || 0;
+                                    const r = Number(hall.rentalFeeDiscount) || 0;
+                                    const total = (g * f) + r;
+
+                                    return (
+                                        <div key={hall.id} className="bg-white p-5 rounded-xl shadow-sm border border-gray-200 relative overflow-hidden">
+                                            <div className="absolute top-0 left-0 w-1 h-full bg-pink-400"></div>
+                                            <div className="flex justify-between items-start mb-3">
+                                                <div>
+                                                    <h2 className="text-lg font-bold text-gray-800">{hall.name}</h2>
+                                                    <p className="text-xs text-gray-500">📅 {hall.tourDate || '날짜 미지정'}</p>
+                                                </div>
+                                                <div className="bg-pink-50 text-pink-600 px-2 py-1 rounded text-sm font-bold flex items-center">
+                                                    ⭐ {hall.rating}
+                                                </div>
+                                            </div>
+                                            <div className="bg-gray-50 p-3 rounded-lg mb-4 text-sm space-y-1">
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-500">보증인원</span>
+                                                    <span className="font-semibold text-gray-700">{hall.guarantee ? hall.guarantee + '명' : '-'}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-500">식대(할인)</span>
+                                                    <span className="font-semibold text-gray-700">{formatMoney(Number(hall.foodPriceDiscount))}</span>
+                                                </div>
+                                                <div className="flex justify-between pt-1 border-t border-gray-200 mt-1">
+                                                    <span className="text-pink-600 font-bold">최종 예상 견적</span>
+                                                    <span className="text-pink-600 font-bold">{formatMoney(total)}</span>
+                                                </div>
+                                            </div>
+                                            <div className="flex space-x-2">
+                                                <button onClick={() => handleEditHall(hall)} className="flex-1 bg-white border border-gray-300 text-gray-700 py-2 rounded-lg font-medium text-sm hover:bg-gray-50">상세 보기 및 수정</button>
+                                                <button onClick={() => handleDelete(hall.id)} className="px-4 bg-white border border-red-200 text-red-500 py-2 rounded-lg font-medium text-sm hover:bg-red-50">삭제</button>
+                                            </div>
                                         </div>
-                                        <div className="text-sm text-gray-600 mb-4 space-y-1">
-                                            <p>📅 {hall.tourDate || '날짜 미지정'}</p>
-                                            <p>💰 총 견적: {hall.totalEstimate ? Number(hall.totalEstimate).toLocaleString() + '원' : '미입력'}</p>
-                                        </div>
-                                        <div className="flex space-x-2">
-                                            <button onClick={() => handleEditHall(hall)} className="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg font-medium">수정/보기</button>
-                                            <button onClick={() => handleDelete(hall.id)} className="px-4 bg-red-50 text-red-500 py-2 rounded-lg font-medium">삭제</button>
-                                        </div>
-                                    </div>
-                                ))
+                                    )
+                                })
                             )}
                         </div>
 
                         <button 
                             onClick={handleAddHall}
-                            className="fixed bottom-6 right-6 w-14 h-14 bg-pink-500 text-white rounded-full shadow-lg text-3xl flex items-center justify-center hover:bg-pink-600 transition"
+                            className="fixed bottom-6 right-6 w-14 h-14 bg-pink-500 text-white rounded-full shadow-xl text-3xl flex items-center justify-center hover:bg-pink-600 transition-transform active:scale-95"
                         >
                             +
                         </button>
@@ -157,119 +223,234 @@
             }
 
             return (
-                <div className="max-w-md mx-auto min-h-screen bg-white">
-                    <header className="bg-pink-500 text-white p-4 sticky top-0 z-10 shadow-md flex justify-between items-center">
-                        <button onClick={() => setCurrentView('list')} className="font-bold">← 뒤로</button>
-                        <h1 className="text-lg font-bold">{activeHall.name ? activeHall.name : '새 웨딩홀 기록'}</h1>
-                        <button onClick={handleSave} className="font-bold">저장</button>
+                <div className="max-w-md mx-auto min-h-screen bg-white pb-10">
+                    <header className="bg-pink-500 text-white p-4 sticky top-0 z-20 shadow-md flex justify-between items-center">
+                        <button onClick={() => { setCurrentView('list'); window.scrollTo(0,0); }} className="font-bold p-1">← 취소</button>
+                        <h1 className="text-lg font-bold truncate px-2">{activeHall.name ? activeHall.name : '새 투어 기록'}</h1>
+                        <button onClick={handleSave} className="font-bold p-1 bg-white text-pink-600 px-3 rounded shadow-sm text-sm">저장</button>
                     </header>
 
                     <div className="p-4 space-y-6">
-                        {/* 기본 정보 */}
+                        {/* 1. 기본 정보 */}
                         <section>
-                            <h3 className="text-pink-600 font-bold border-b border-pink-100 pb-2 mb-3">📌 기본 정보</h3>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">웨딩홀 이름 *</label>
-                                <input type="text" name="name" value={activeHall.name} onChange={handleChange} className="input-field" placeholder="예: 더채플앳논현" />
-                            </div>
-                            <div className="mt-3">
-                                <label className="block text-sm font-medium text-gray-700">투어 날짜</label>
-                                <input type="date" name="tourDate" value={activeHall.tourDate} onChange={handleChange} className="input-field" />
-                            </div>
-                        </section>
-
-                        {/* 위치 및 주차 */}
-                        <section>
-                            <h3 className="text-pink-600 font-bold border-b border-pink-100 pb-2 mb-3">🚗 위치 & 주차</h3>
+                            <h3 className="section-title">📌 1. 기본 정보</h3>
                             <div className="space-y-3">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">대중교통 접근성</label>
-                                    <input type="text" name="subway" value={activeHall.subway} onChange={handleChange} className="input-field" placeholder="예: 9호선 언주역 도보 5분" />
+                                    <label className="label-text">웨딩홀 이름 *</label>
+                                    <input type="text" name="name" value={activeHall.name} onChange={handleChange} className="input-field" placeholder="예: 더채플앳논현" />
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">주차 대수 및 시간</label>
-                                    <input type="text" name="parkingCapacity" value={activeHall.parkingCapacity} onChange={handleChange} className="input-field" placeholder="예: 500대 / 하객 2시간 무료" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">발렛/ATM 등 편의시설</label>
-                                    <input type="text" name="atmInfo" value={activeHall.atmInfo} onChange={handleChange} className="input-field" placeholder="예: 1층에 ATM 있음" />
+                                <div className="grid-2">
+                                    <div>
+                                        <label className="label-text">투어 날짜</label>
+                                        <input type="date" name="tourDate" value={activeHall.tourDate} onChange={handleChange} className="input-field" />
+                                    </div>
+                                    <div>
+                                        <label className="label-text">상담자 이름</label>
+                                        <input type="text" name="consultant" value={activeHall.consultant} onChange={handleChange} className="input-field" placeholder="예: 김상담 실장" />
+                                    </div>
                                 </div>
                             </div>
                         </section>
 
-                        {/* 홀 컨디션 */}
+                        {/* 2. 교통 및 주차 */}
                         <section>
-                            <h3 className="text-pink-600 font-bold border-b border-pink-100 pb-2 mb-3">✨ 홀 분위기 & 동선</h3>
+                            <h3 className="section-title">🚗 2. 위치 및 주차</h3>
                             <div className="space-y-3">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">홀 느낌</label>
-                                    <input type="text" name="hallType" value={activeHall.hallType} onChange={handleChange} className="input-field" placeholder="예: 어두운 컨벤션, 채플, 하우스" />
+                                    <label className="label-text">대중교통 (지하철)</label>
+                                    <input type="text" name="subway" value={activeHall.subway} onChange={handleChange} className="input-field" placeholder="예: 9호선 언주역 도보 3분" />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">천고 / 좌석 수</label>
-                                    <input type="text" name="seatCount" value={activeHall.seatCount} onChange={handleChange} className="input-field" placeholder="예: 천고 높음 / 200석" />
+                                    <label className="label-text">셔틀버스 및 버스</label>
+                                    <input type="text" name="busAndShuttle" value={activeHall.busAndShuttle} onChange={handleChange} className="input-field" placeholder="예: 15분 간격 셔틀 운행" />
+                                </div>
+                                <div className="grid-2">
+                                    <div>
+                                        <label className="label-text">주차 대수</label>
+                                        <input type="text" name="parkingCapacity" value={activeHall.parkingCapacity} onChange={handleChange} className="input-field" placeholder="예: 동시 500대" />
+                                    </div>
+                                    <div>
+                                        <label className="label-text">무료 주차 시간</label>
+                                        <input type="text" name="parkingTime" value={activeHall.parkingTime} onChange={handleChange} className="input-field" placeholder="예: 하객 2시간" />
+                                    </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">신부대기실 (화장실, 동선)</label>
-                                    <input type="text" name="bridalRoom" value={activeHall.bridalRoom} onChange={handleChange} className="input-field" placeholder="예: 화장실 있음, 홀과 바로 연결" />
+                                    <label className="label-text">혼주 발렛 / ATM / 엘리베이터 수</label>
+                                    <input type="text" name="atmAndElevator" value={activeHall.atmAndElevator} onChange={handleChange} className="input-field" placeholder="예: 혼주 2대 발렛, 엘베 4대, 1층 ATM" />
                                 </div>
                             </div>
                         </section>
 
-                        {/* 식사 */}
+                        {/* 3. 홀 컨디션 */}
                         <section>
-                            <h3 className="text-pink-600 font-bold border-b border-pink-100 pb-2 mb-3">🍽️ 식사 (연회장)</h3>
+                            <h3 className="section-title">✨ 3. 홀 컨디션</h3>
+                            <div className="space-y-3">
+                                <div className="grid-2">
+                                    <div>
+                                        <label className="label-text">예식 형태</label>
+                                        <input type="text" name="hallType" value={activeHall.hallType} onChange={handleChange} className="input-field" placeholder="예: 단독홀, 동시예식" />
+                                    </div>
+                                    <div>
+                                        <label className="label-text">홀 분위기</label>
+                                        <input type="text" name="atmosphere" value={activeHall.atmosphere} onChange={handleChange} className="input-field" placeholder="예: 어두운 컨벤션" />
+                                    </div>
+                                </div>
+                                <div className="grid-2">
+                                    <div>
+                                        <label className="label-text">천장 높이(천고)</label>
+                                        <input type="text" name="ceilingHeight" value={activeHall.ceilingHeight} onChange={handleChange} className="input-field" placeholder="예: 7m (높음)" />
+                                    </div>
+                                    <div>
+                                        <label className="label-text">예식 간격</label>
+                                        <input type="text" name="ceremonyInterval" value={activeHall.ceremonyInterval} onChange={handleChange} className="input-field" placeholder="예: 90분" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="label-text">버진로드 (단차/길이)</label>
+                                    <input type="text" name="virginRoad" value={activeHall.virginRoad} onChange={handleChange} className="input-field" placeholder="예: 화이트톤, 단차 있음, 김" />
+                                </div>
+                                <div>
+                                    <label className="label-text">좌석 수 및 하객 섞임 여부</label>
+                                    <input type="text" name="mixedGuests" value={activeHall.mixedGuests} onChange={handleChange} className="input-field" placeholder="예: 250석, 앞뒤 타임 섞임 주의" />
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* 4. 신부대기실 및 부대시설 */}
+                        <section>
+                            <h3 className="section-title">👗 4. 신부대기실 & 부대시설</h3>
                             <div className="space-y-3">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">식사 종류</label>
-                                    <input type="text" name="foodType" value={activeHall.foodType} onChange={handleChange} className="input-field" placeholder="예: 뷔페 120종" />
+                                    <label className="label-text">신부대기실 (넓이/채광/전용 화장실)</label>
+                                    <input type="text" name="bridalRoomSpace" value={activeHall.bridalRoomSpace} onChange={handleChange} className="input-field" placeholder="예: 넓고 채광 좋음, 화장실 O" />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">연회장 크기 및 이용시간</label>
-                                    <input type="text" name="diningRoomCapacity" value={activeHall.diningRoomCapacity} onChange={handleChange} className="input-field" placeholder="예: 700석 / 2시간" />
+                                    <label className="label-text">대기실 -> 홀 입장 동선</label>
+                                    <input type="text" name="bridalRoomPath" value={activeHall.bridalRoomPath} onChange={handleChange} className="input-field" placeholder="예: 비밀문 통해 버진로드 바로 연결" />
+                                </div>
+                                <div>
+                                    <label className="label-text">로비 및 축의대 (넓이/혼잡도)</label>
+                                    <input type="text" name="lobbySpace" value={activeHall.lobbySpace} onChange={handleChange} className="input-field" placeholder="예: 로비가 다소 좁음" />
+                                </div>
+                                <div>
+                                    <label className="label-text">폐백실 여부 / 수모비</label>
+                                    <input type="text" name="paebaek" value={activeHall.paebaek} onChange={handleChange} className="input-field" placeholder="예: 진행안함 / 진행시 수모비 10만" />
                                 </div>
                             </div>
                         </section>
 
-                        {/* 견적 */}
+                        {/* 5. 식사 */}
                         <section>
-                            <h3 className="text-pink-600 font-bold border-b border-pink-100 pb-2 mb-3">💰 견적 (비용)</h3>
+                            <h3 className="section-title">🍽️ 5. 식사 및 연회장</h3>
                             <div className="space-y-3">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">보증 인원</label>
-                                    <input type="number" name="guarantee" value={activeHall.guarantee} onChange={handleChange} className="input-field" placeholder="예: 250" />
+                                <div className="grid-2">
+                                    <div>
+                                        <label className="label-text">식사 종류</label>
+                                        <input type="text" name="foodType" value={activeHall.foodType} onChange={handleChange} className="input-field" placeholder="예: 뷔페 140여종" />
+                                    </div>
+                                    <div>
+                                        <label className="label-text">음주류 포함 여부</label>
+                                        <input type="text" name="drinkIncluded" value={activeHall.drinkIncluded} onChange={handleChange} className="input-field" placeholder="예: 생맥/소주 포함" />
+                                    </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">식대 (할인가 기준)</label>
-                                    <input type="number" name="foodPrice" value={activeHall.foodPrice} onChange={handleChange} className="input-field" placeholder="숫자만 입력 (예: 65000)" />
+                                    <label className="label-text">연회장 동선 및 크기</label>
+                                    <input type="text" name="diningRoomFloor" value={activeHall.diningRoomFloor} onChange={handleChange} className="input-field" placeholder="예: 한 층 아래 계단 이동, 700석" />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">대관료 (생화장출 등 포함)</label>
-                                    <input type="number" name="rentalFee" value={activeHall.rentalFee} onChange={handleChange} className="input-field" placeholder="숫자만 입력 (예: 3000000)" />
-                                </div>
-                                <div className="bg-pink-50 p-3 rounded-lg border border-pink-200">
-                                    <label className="block text-sm font-bold text-pink-700">최종 견적 (대략)</label>
-                                    <input type="number" name="totalEstimate" value={activeHall.totalEstimate} onChange={handleChange} className="input-field bg-white" placeholder="자동계산 또는 직접입력" />
-                                    <p className="text-xs text-gray-500 mt-1">* 참고: (보증인원 x 식대) + 대관료 = {(activeHall.guarantee * activeHall.foodPrice) + Number(activeHall.rentalFee)}원</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">당일 혜택 및 특이사항</label>
-                                    <textarea name="perks" value={activeHall.perks} onChange={handleChange} className="input-field" rows="2" placeholder="예: 당일 계약 시 식대 2천원 할인, 전문 사회자 서비스"></textarea>
+                                    <label className="label-text">이용 시간 및 혼주석 유무</label>
+                                    <input type="text" name="mealTime" value={activeHall.mealTime} onChange={handleChange} className="input-field" placeholder="예: 예식 30분전부터 2시간, 혼주룸 O" />
                                 </div>
                             </div>
                         </section>
 
-                        {/* 총평 */}
+                        {/* 6. 견적(자동계산) */}
+                        <section>
+                            <h3 className="section-title">💰 6. 견적 및 혜택 (자동 계산)</h3>
+                            
+                            <div className="bg-pink-50 p-4 rounded-xl border border-pink-200 mb-4 shadow-inner">
+                                <h4 className="font-bold text-pink-700 mb-3 border-b border-pink-200 pb-2">🧾 최종 예상 견적</h4>
+                                <div className="space-y-2 text-sm text-gray-700">
+                                    <div className="flex justify-between items-center">
+                                        <span>보증인원: {activeHall.guarantee ? activeHall.guarantee : '0'}명</span>
+                                        <span>X</span>
+                                        <span>식대: {formatMoney(Number(activeHall.foodPriceDiscount))}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-gray-500">
+                                        <span>+ 대관료: {formatMoney(Number(activeHall.rentalFeeDiscount))}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center pt-2 mt-2 border-t border-pink-200 text-lg font-bold text-pink-700">
+                                        <span>총 합계:</span>
+                                        <span>{formatMoney(calculateTotal())}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                    <label className="label-text text-gray-800 font-bold mb-2">필수 입력 (숫자만)</label>
+                                    <div>
+                                        <label className="label-text">보증 인원 (명)</label>
+                                        <input type="number" name="guarantee" value={activeHall.guarantee} onChange={handleChange} className="input-field font-bold" placeholder="예: 250" />
+                                    </div>
+                                </div>
+
+                                <div className="grid-2">
+                                    <div>
+                                        <label className="label-text">대관료 (정가)</label>
+                                        <input type="number" name="rentalFeeOriginal" value={activeHall.rentalFeeOriginal} onChange={handleChange} className="input-field bg-gray-100" placeholder="숫자만" />
+                                    </div>
+                                    <div>
+                                        <label className="label-text text-pink-600">대관료 (할인가) *</label>
+                                        <input type="number" name="rentalFeeDiscount" value={activeHall.rentalFeeDiscount} onChange={handleChange} className="input-field border-pink-300 bg-pink-50" placeholder="계산용 (숫자만)" />
+                                    </div>
+                                </div>
+
+                                <div className="grid-2">
+                                    <div>
+                                        <label className="label-text">식대 (정가)</label>
+                                        <input type="number" name="foodPriceOriginal" value={activeHall.foodPriceOriginal} onChange={handleChange} className="input-field bg-gray-100" placeholder="숫자만" />
+                                    </div>
+                                    <div>
+                                        <label className="label-text text-pink-600">식대 (할인가) *</label>
+                                        <input type="number" name="foodPriceDiscount" value={activeHall.foodPriceDiscount} onChange={handleChange} className="input-field border-pink-300 bg-pink-50" placeholder="계산용 (숫자만)" />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="label-text">당일 계약 혜택 및 서비스 (플라워샤워 등)</label>
+                                    <textarea name="perks" value={activeHall.perks} onChange={handleChange} className="input-field" rows="2" placeholder="예: 전문 사회자 무료, 식대 2000원 추가 할인"></textarea>
+                                </div>
+                                <div className="grid-2">
+                                    <div>
+                                        <label className="label-text">계약금</label>
+                                        <input type="text" name="deposit" value={activeHall.deposit} onChange={handleChange} className="input-field" placeholder="예: 200만원" />
+                                    </div>
+                                    <div>
+                                        <label className="label-text">취소 위약금 규정</label>
+                                        <input type="text" name="cancelPolicy" value={activeHall.cancelPolicy} onChange={handleChange} className="input-field" placeholder="예: 150일 전 전액 환불" />
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* 7. 총평 */}
                         <section className="pb-10">
-                            <h3 className="text-pink-600 font-bold border-b border-pink-100 pb-2 mb-3">📝 총평</h3>
+                            <h3 className="section-title">📝 7. 최종 평가</h3>
                             <div className="space-y-3">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">내 마음속 평점 (1~5)</label>
-                                    <input type="number" name="rating" min="1" max="5" value={activeHall.rating} onChange={handleChange} className="input-field" />
+                                    <label className="label-text">내 마음속 평점 (1~5)</label>
+                                    <select name="rating" value={activeHall.rating} onChange={handleChange} className="input-field font-bold text-lg text-center">
+                                        <option value="5">⭐⭐⭐⭐⭐ (최고! 계약하고 싶음)</option>
+                                        <option value="4">⭐⭐⭐⭐ (좋음! 후보 등록)</option>
+                                        <option value="3">⭐⭐⭐ (무난함)</option>
+                                        <option value="2">⭐⭐ (아쉬움)</option>
+                                        <option value="1">⭐ (별로임)</option>
+                                    </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">개인적인 장단점 / 메모</label>
-                                    <textarea name="notes" value={activeHall.notes} onChange={handleChange} className="input-field" rows="4" placeholder="예: 홀은 예쁜데 주차가 헬이다. 밥은 맛있어보임."></textarea>
+                                    <label className="label-text">장점 / 단점 / 개인적인 메모</label>
+                                    <textarea name="notes" value={activeHall.notes} onChange={handleChange} className="input-field" rows="4" placeholder="예: 홀 분위기는 완벽했으나, 주차장이 좁아서 하객들 컴플레인이 걱정됨. 밥은 평이 좋음."></textarea>
                                 </div>
                             </div>
                         </section>
