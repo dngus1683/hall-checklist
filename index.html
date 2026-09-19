@@ -98,6 +98,13 @@ if (typeof crypto === 'object' && !crypto.randomUUID) {
       };
    } catch (e) {}
 }
+// Safe UUID generator that prefers crypto.randomUUID when available
+function uuid(){
+   try{
+      if(typeof crypto!=='undefined' && typeof crypto.randomUUID==='function') return crypto.randomUUID();
+   }catch(e){}
+   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,function(c){const r=Math.random()*16|0;const v=c==='x'?r:(r&0x3|0x8);return v.toString(16)});
+}
 const sections=[
 ["1. 기본정보",[
 ["text","위치"],["text","가까운 지하철역"],["text","지하철역 도보 소요시간"],["choice","지하철역 → 홀 경사유무",["심함","내리막","평지"]],["choice","예식 진행",["동시예식","분리예식"]],["number","엘리베이터 개수"],["text","예식타임"],["text","예식간격"],["choice","꽃장식",["생화","생화+조화","하객 생화포장"]]
@@ -191,7 +198,7 @@ function saveCurrent(){
  if(!state.hallName.trim()){toast("먼저 웨딩홀 이름을 입력해주세요.");return}
  const obj={...state,updated:new Date().toISOString()};
  const idx=db.findIndex(x=>x.id===state.id);
- if(idx>=0) db[idx]=obj; else {obj.id=crypto.randomUUID();state.id=obj.id;db.push(obj)}
+ if(idx>=0) db[idx]=obj; else {obj.id=uuid();state.id=obj.id;db.push(obj)}
  localStorage.setItem("weddingHallsV1",JSON.stringify(db));
  persistDraft(); toast("저장했습니다 ✓");
 }
