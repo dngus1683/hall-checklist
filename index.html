@@ -81,6 +81,23 @@ footer{padding:8px 10px calc(8px + env(safe-area-inset-bottom))}
 <div class="toast" id="toast"></div>
 
 <script>
+// Compatibility polyfills for older browsers (iOS Safari, etc.)
+if (!String.prototype.replaceAll) {
+   String.prototype.replaceAll = function(search, replace) {
+      return this.split(search).join(replace);
+   };
+}
+if (typeof crypto === 'object' && !crypto.randomUUID) {
+   try {
+      crypto.randomUUID = function() {
+         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            const r = Math.random() * 16 | 0;
+            const v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+         });
+      };
+   } catch (e) {}
+}
 const sections=[
 ["1. 기본정보",[
 ["text","위치"],["text","가까운 지하철역"],["text","지하철역 도보 소요시간"],["choice","지하철역 → 홀 경사유무",["심함","내리막","평지"]],["choice","예식 진행",["동시예식","분리예식"]],["number","엘리베이터 개수"],["text","예식타임"],["text","예식간격"],["choice","꽃장식",["생화","생화+조화","하객 생화포장"]]
@@ -115,7 +132,10 @@ let state={id:null,hallName:"",values:{},section:0};
 let db=JSON.parse(localStorage.getItem("weddingHallsV1")||"[]");
 
 function key(s,f){return s+"::"+f}
-function esc(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;")}
+function esc(v){
+   const str = (v==null)?"":String(v);
+   return str.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
+}
 function render(){
  const app=document.getElementById("app"), s=sections[state.section];
  let done=s[1].filter(f=>state.values[key(s[0],f[1])]).length;
