@@ -1,234 +1,284 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#fff8fb">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="웨딩홀 투어">
-<link rel="manifest" href="manifest.json">
-<title>웨딩홀 투어 체크리스트</title>
-<style>
-:root{--bg:#fff8fb;--card:#fff;--text:#252127;--muted:#7d737c;--line:#eee5ea;--accent:#d95b8a;--accent2:#ffe5ef;--green:#23855d;--shadow:0 4px 18px rgba(80,40,60,.07)}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;padding-bottom:92px}
-header{position:sticky;top:0;z-index:20;background:rgba(255,248,251,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:12px 16px 10px}
-.top{display:flex;align-items:center;justify-content:space-between}.title{font-size:20px;font-weight:800}.sub{font-size:12px;color:var(--muted);margin-top:3px}
-button{font:inherit;border:0}.iconbtn{background:white;border:1px solid var(--line);border-radius:12px;padding:9px 11px}
-.progress{height:5px;background:#f1e9ed;border-radius:9px;margin-top:10px;overflow:hidden}.progress>div{height:100%;background:var(--accent);width:0;transition:.2s}
-main{max-width:720px;margin:auto;padding:16px}.hero{background:linear-gradient(135deg,#fff,#fff0f6);border:1px solid #f2dce6;border-radius:20px;padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
-.hall{font-size:24px;font-weight:900}.hall input{width:100%;font-size:24px;font-weight:900;border:0;background:transparent;outline:0;padding:0}.hint{color:var(--muted);font-size:13px;margin-top:7px}
-.section{background:var(--card);border:1px solid var(--line);border-radius:18px;margin:12px 0;overflow:hidden;box-shadow:var(--shadow)}
-.section-head{padding:16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}.section-title{font-size:17px;font-weight:800}.count{font-size:12px;color:var(--muted);background:#f8f1f4;padding:5px 8px;border-radius:10px}
-.section-body{padding:0 14px 14px}.field{padding:13px 2px;border-top:1px solid var(--line)}.label{font-weight:700;font-size:14px;margin-bottom:9px}.note{font-size:11px;color:var(--muted);font-weight:500}
-input[type=text],input[type=number],textarea{width:100%;border:1px solid var(--line);border-radius:11px;padding:11px;background:#fff;font-size:16px;outline:none}textarea{min-height:82px;resize:vertical}
-.choice{display:flex;flex-wrap:wrap;gap:7px}.choice button{background:#faf7f8;border:1px solid var(--line);padding:9px 11px;border-radius:11px;font-size:14px;color:#4c444a}.choice button.active{background:var(--accent2);border-color:#ed9fbd;color:#a52c5e;font-weight:800}
-.toggle{display:flex;gap:8px}.toggle button{flex:1}.stars{display:flex;gap:5px}.stars button{font-size:27px;background:none;padding:0;color:#ddd}.stars button.active{color:#e6a52e}
-footer{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:9px 12px calc(9px + env(safe-area-inset-bottom));z-index:30}.nav{max-width:720px;margin:auto;display:flex;gap:8px}.nav button{flex:1;background:#f7f1f4;border-radius:13px;padding:11px 5px;font-size:12px}.nav button.primary{background:var(--accent);color:white;font-weight:800}
-.modal{position:fixed;inset:0;background:rgba(25,15,20,.45);display:none;align-items:flex-end;z-index:50}.modal.open{display:flex}.sheet{background:#fff;border-radius:22px 22px 0 0;width:100%;max-height:82vh;overflow:auto;padding:20px}.sheet h2{margin:0 0 14px}.hall-card{border:1px solid var(--line);border-radius:15px;padding:14px;margin:8px 0}.hall-card b{font-size:17px}.row{display:flex;gap:8px;margin-top:10px}.row button{flex:1;background:#f6f1f3;border-radius:10px;padding:10px}.danger{color:#b22b50}
-.toast{position:fixed;left:50%;bottom:105px;transform:translateX(-50%);background:#292329;color:#fff;padding:10px 14px;border-radius:12px;font-size:13px;opacity:0;pointer-events:none;transition:.2s;z-index:80}.toast.show{opacity:1}
-
-/* --- Tour UX v2 --- */
-body{background:#f8f7f8}
-header{padding:10px 14px 9px}
-.title{font-size:18px}
-.quick{display:flex;gap:7px;overflow-x:auto;padding:8px 0 2px;scrollbar-width:none}
-.quick::-webkit-scrollbar{display:none}
-.quick button{flex:0 0 auto;background:#fff;border:1px solid #e9e1e5;border-radius:999px;padding:7px 11px;font-size:12px;color:#665d64}
-.quick button.active{background:#292329;color:#fff;border-color:#292329}
-main{padding:12px 13px 110px}
-.hero{position:relative;margin-bottom:10px;padding:15px 16px;border-radius:16px}
-.hall input{font-size:21px}
-.hint{font-size:12px}
-.section{border-radius:15px;margin:8px 0}
-.section-head{padding:14px}
-.section-body{padding:0 13px 13px}
-.field{padding:12px 1px}
-.label{font-size:15px;margin-bottom:8px}
-.choice{gap:6px}
-.choice button{min-height:44px;padding:9px 13px;border-radius:12px;font-size:14px;flex:1 1 auto}
-.choice button.active{box-shadow:0 1px 0 rgba(0,0,0,.04)}
-input[type=text],input[type=number],textarea{min-height:46px;font-size:16px;border-radius:12px}
-textarea{min-height:96px}
-.stars{justify-content:space-between}
-.stars button{font-size:30px;padding:2px 3px}
-footer{padding:8px 10px calc(8px + env(safe-area-inset-bottom))}
-.nav button{min-height:46px;border-radius:12px;font-weight:700}
-.nav button.primary{flex:1.4}
-.complete{background:#fff;border:1px solid #e8e0e4;border-radius:15px;padding:13px 14px;margin:10px 0;display:flex;align-items:center;justify-content:space-between}
-.complete b{font-size:14px}.complete span{font-size:12px;color:#777}
-.summary{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
-.summary .tile{background:#fff;border:1px solid #e8e0e4;border-radius:13px;padding:11px}
-.summary .k{font-size:11px;color:#888}.summary .v{font-size:17px;font-weight:800;margin-top:3px}
-.fab{position:fixed;right:14px;bottom:72px;width:50px;height:50px;border-radius:50%;background:#292329;color:#fff;font-size:21px;box-shadow:0 5px 18px rgba(0,0,0,.18);z-index:25}
-.modal{align-items:flex-end}
-.sheet{padding-bottom:calc(22px + env(safe-area-inset-bottom))}
-.hall-card{background:#fff}
-.smallbtn{font-size:12px!important}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>웨딩홀 투어 체크리스트</title>
+    <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6; }
+        .input-field { width: 100%; padding: 0.5rem; border-radius: 0.375rem; border: 1px solid #d1d5db; margin-top: 0.25rem; font-size: 16px; }
+        .checkbox-label { display: flex; align-items: center; space-x: 0.5rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .checkbox-input { width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; }
+    </style>
 </head>
 <body>
-<header>
-  <div class="top"><div><div class="title">💍 웨딩홀 투어</div><div class="sub" id="status">새 웨딩홀</div></div><button class="iconbtn" onclick="openList()">📋 홀 목록</button></div>
-  <div class="progress"><div id="bar"></div></div>
-  <div class="quick" id="quickNav"></div>
-</header>
-<main id="app"></main><button class="fab" onclick="openList()" aria-label="홀 목록">☰</button>
-<footer><div class="nav">
-<button onclick="prevSection()">← 이전</button><button class="primary" onclick="nextSection()">다음 →</button><button onclick="saveCurrent()">저장</button>
-</div></footer>
-<div class="modal" id="modal"><div class="sheet"><div class="top"><h2>저장된 웨딩홀</h2><button class="iconbtn" onclick="closeList()">닫기</button></div><div id="hallList"></div><div class="row"><button onclick="newHall()">＋ 새 웨딩홀</button><button onclick="exportAll()">백업 내보내기</button></div><div class="row"><button onclick="importData()">백업 가져오기</button><button class="danger" onclick="clearAll()">전체 삭제</button></div></div></div>
-<div class="toast" id="toast"></div>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
 
-<script>
-// Compatibility polyfills for older browsers (iOS Safari, etc.)
-if (!String.prototype.replaceAll) {
-   String.prototype.replaceAll = function(search, replace) {
-      return this.split(search).join(replace);
-   };
-}
-if (typeof crypto === 'object' && !crypto.randomUUID) {
-   try {
-      crypto.randomUUID = function() {
-         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            const r = Math.random() * 16 | 0;
-            const v = c === 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-         });
-      };
-   } catch (e) {}
-}
-// Safe UUID generator that prefers crypto.randomUUID when available
-function uuid(){
-   try{
-      if(typeof crypto!=='undefined' && typeof crypto.randomUUID==='function') return crypto.randomUUID();
-   }catch(e){}
-   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,function(c){const r=Math.random()*16|0;const v=c==='x'?r:(r&0x3|0x8);return v.toString(16)});
-}
-const sections=[
-["1. 기본정보",[
-["text","위치"],["text","가까운 지하철역"],["text","지하철역 도보 소요시간"],["choice","지하철역 → 홀 경사유무",["심함","내리막","평지"]],["choice","예식 진행",["동시예식","분리예식"]],["number","엘리베이터 개수"],["text","예식타임"],["text","예식간격"],["choice","꽃장식",["생화","생화+조화","하객 생화포장"]]
-]],
-["2. 신부대기실",[
-["choice","위치",["홀과 같은층","홀과 다른층","외부"]],["choice","크기",["좁음","적당","넓음"]],["choice","채광",["자연광","조명"]],["choice","내부 개인화장실",["O","X"]],["choice","음료제공여부",["O","X"]],["choice","서브 신부대기실 여부",["O","X"]],["choice","홀&신부대기실 연결 여부",["O","X"]],["text","층고"],["text","생화비율"]
-]],
-["3. 홀",[
-["choice","홀 분위기",["어두움","밝음","하우스","채플","야외","한옥"]],["choice","마음에 드는 홀",["O","X"]],["text","층고"],["number","버진로드 길이 (m)"],["choice","버진로드 단차",["없음","중간","높음"]],["number","홀 좌석수"],["number","최대 수용인원"],["text","생화비율"],["choice","플라워샤워",["기계식","도우미","지인","없음"]],["text","신부입장 방법"],["text","신랑입장 방법"],["text","축의금 접수대 사용 가능시간"],["choice","식전 영상",["O","X"]],["choice","단독홀 여부",["O","X"]],["number","스크린 개수"],["choice","스크린 위치",["정면","측면"]]
-]],
-["4. 연회장",[
-["choice","음식",["뷔페","코스","케이터링","한상차림"]],["choice","위치",["홀과 같은층","홀과 다른층","외부"]],["text","분위기"],["text","이용시간"],["number","수용인원"],["choice","식권",["홀제작","직접제작"]],["number","음식 가지 수"],["text","음식 퀄리티"],["text","테이블 간격"],["choice","혼주 개별룸 유무",["O","X"]],["choice","주류 서비스 유무",["O","X"]],["choice","답례품",["O","X"]],["choice","남은식권 답례품 교환 여부",["O","X"]],["choice","혼주/신랑신부 식사 무료제공",["O","X"]],["choice","예식 실시간 상영 여부",["O","X"]],["number","시식인원 몇명 제공? (명)"]]
-]],
-["5. 교통 & 주차",[
-["number","주차대수 - 하객"],["number","주차대수 - 혼주&신랑신부"],["text","무료 주차시간 - 하객"],["text","무료 주차시간 - 혼주&신랑신부"],["choice","대절버스 주차 가능 여부",["O","X"]],["choice","발렛 여부",["O","X"]],["number","발렛 비용 (원)"],["choice","지방하객접근성",["상","중","하"]],["choice","셔틀버스 운영 유무",["O","X"]],["text","셔틀버스 지하철역"],["text","셔틀버스 운행 간격 (분)"],["choice","주차장과 홀 연결 여부",["O","X"]]
-]],
-["6. 결제",[
-["number","대관료 (원)"],["number","식대 - 대인 (원)"],["number","식대 - 소인 (원)"],["number","음료 (원)"],["choice","보증인원 초과시 식대",["할인견적","정상가"]],["number","최소 보증인원"],["choice","보증인원 추가시 식대 할인 여부",["O","X"]],["number","계약금 (원)"],["text","날짜변경 가능여부 & 위약금"],["text","환불규정 (무료취소기간/위약금)"],["choice","현금 영수증 가능여부",["O","X"]],["choice","각보증 여부",["O","X"]]
-]],
-["7. 선택사항 & 필수사항 & 비용",[
-["text","포토테이블 (선택/필수/비용)"],["text","전문 사회자 (선택/필수/비용)"],["text","플라워샤워 (선택/필수/비용)"],["text","현악 3중주 (선택/필수/비용)"],["text","포토부스 (선택/필수/비용)"],["text","본식스냅 (선택/필수/비용)"],["text","웨딩 컨시어즈 (선택/필수/비용)"],["text","축가 (선택/필수/비용)"],["text","혼주 메이크업 (선택/필수/비용)"]
-]],
-["8. 기타사항",[
-["textarea","당일혜택"],["text","화환위치"],["choice","로비",["넓음","좁음"]],["text","축의대 위치"],["text","이외 추가금"],["text","사전 음식 시식 (최대 인원/횟수)"],["text","보증인원 변경 가능 시점"],["text","ATM 위치"],["textarea","장점 (1~3)"],["textarea","단점 (1~3)"]
-]],
-["9. 만족도 (10점 만점)",[
-["rating","예산 만족도"],["rating","위치 만족도"],["rating","음식 만족도"],["rating","주차 만족도"],["rating","부모님 만족도"],["rating","규모 만족도"],["rating","분위기 만족도"],["rating","종합 만족도"]
-]]
-];
+        const initialHallData = {
+            id: Date.now(),
+            name: '',
+            tourDate: '',
+            // 1. 기본/교통/주차
+            subway: '',
+            parkingCapacity: '',
+            parkingFee: '',
+            atmInfo: '',
+            // 2. 홀 컨디션
+            hallType: '', // 어두운홀/밝은홀
+            ceilingHeight: '',
+            seatCount: '',
+            bridalRoom: '', // 동선, 화장실 여부
+            // 3. 식사
+            foodType: '', // 뷔페/코스/한상차림
+            diningRoomCapacity: '',
+            tastingReview: '',
+            // 4. 견적 (비용)
+            guarantee: '', // 보증인원
+            rentalFee: '', // 대관료
+            foodPrice: '', // 식대
+            totalEstimate: '', // 총 견적
+            perks: '', // 당일 혜택 등
+            // 5. 총평
+            rating: 3,
+            notes: ''
+        };
 
-let state={id:null,hallName:"",values:{},section:0};
-let db=JSON.parse(localStorage.getItem("weddingHallsV1")||"[]");
+        function App() {
+            const [halls, setHalls] = useState([]);
+            const [currentView, setCurrentView] = useState('list'); // 'list' or 'detail'
+            const [activeHall, setActiveHall] = useState(null);
 
-function key(s,f){return s+"::"+f}
-function esc(v){
-   const str = (v==null)?"":String(v);
-   return str.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
-}
-function render(){
- const app=document.getElementById("app"), s=sections[state.section];
- let done=s[1].filter(f=>state.values[key(s[0],f[1])]).length;
- document.getElementById("bar").style.width=((state.section+1)/sections.length*100)+"%";
- document.getElementById("status").textContent=(state.hallName||"새 웨딩홀")+" · "+(state.section+1)+"/"+sections.length;
- renderQuickNav();
+            // 로컬 스토리지에서 데이터 불러오기
+            useEffect(() => {
+                const savedData = localStorage.getItem('weddingHalls');
+                if (savedData) {
+                    setHalls(JSON.parse(savedData));
+                }
+            }, []);
 
- let h=`<div class="hero"><div class="hall"><input value="${esc(state.hallName)}" placeholder="웨딩홀 이름을 입력하세요" oninput="state.hallName=this.value;persistDraft()"></div><div class="hint">☑ 선택은 즉시 저장 · 위 메뉴를 누르면 원하는 항목으로 이동</div></div>`;
+            // 데이터 저장하기
+            const saveToLocal = (data) => {
+                localStorage.setItem('weddingHalls', JSON.stringify(data));
+            };
 
- // Lightweight summary appears after basic information
- if(state.section>0){
-   const base=sections[0][1];
-   const loc=state.values[key("1. 기본정보","위치")]||"-";
-   const subway=state.values[key("1. 기본정보","가까운 지하철역")]||"-";
-   const food=state.values[key("4. 연회장","음식")]||"-";
-   const price=state.values[key("6. 결제","식대 - 대인 (원)")];
-   h+=`<div class="summary"><div class="tile"><div class="k">위치</div><div class="v">${esc(loc)}</div></div><div class="tile"><div class="k">지하철</div><div class="v">${esc(subway)}</div></div><div class="tile"><div class="k">식사</div><div class="v">${esc(food)}</div></div><div class="tile"><div class="k">대인 식대</div><div class="v">${price?Number(price).toLocaleString()+"원":"-"}</div></div></div>`;
- }
+            const handleAddHall = () => {
+                const newHall = { ...initialHallData, id: Date.now() };
+                setActiveHall(newHall);
+                setCurrentView('detail');
+            };
 
- h+=`<div class="complete"><div><b>${s[0]}</b><div><span>${done}/${s[1].length} 입력 완료</span></div></div><div>${done===s[1].length?'✓ 완료':'진행 중'}</div></div>`;
- h+=`<div class="section"><div class="section-body">`;
- for(const f of s[1]){
-   const k=key(s[0],f[1]), v=state.values[k]||"";
-   h+=`<div class="field"><div class="label">${f[1]}${f[0]==="number"?'<span class="note"> 숫자</span>':""}</div>`;
-   if(f[0]==="choice"){
-      h+='<div class="choice">'+f[2].map(x=>`<button class="${v===x?'active':''}" onclick="setv('${esc(k)}','${esc(x)}')">${x}</button>`).join("")+'</div>';
-   } else if(f[0]==="rating"){
-      h+='<div class="stars">'+[1,2,3,4,5,6,7,8,9,10].map(x=>`<button class="${Number(v)>=x?'active':''}" onclick="setv('${esc(k)}','${x}')">★</button>`).join("")+'</div>';
-      if(v) h+=`<div class="hint">${v}/10점 · 다시 누르면 변경</div>`;
-   } else if(f[0]==="textarea"){
-      h+=`<textarea oninput="setv('${esc(k)}',this.value)" placeholder="현장에서 느낀 점을 짧게 기록하세요">${esc(v)}</textarea>`;
-   } else {
-      h+=`<input type="${f[0]==="number"?"number":"text"}" value="${esc(v)}" oninput="setv('${esc(k)}',this.value)" placeholder="${f[0]==="number"?"숫자 입력":"현장에서 확인 후 입력"}">`;
-   }
-   h+='</div>';
- }
- h+='</div></div>';
- app.innerHTML=h;
-}
-function renderQuickNav(){
- const q=document.getElementById("quickNav");
- q.innerHTML=sections.map((x,i)=>`<button class="${i===state.section?'active':''}" onclick="goSection(${i})">${i+1}. ${x[0].replace(/^\\d+\\. /,'')}</button>`).join("");
- const active=q.querySelector(".active");
- if(active) setTimeout(()=>active.scrollIntoView({behavior:"smooth",inline:"center",block:"nearest"}),0);
-}
-function goSection(i){state.section=Math.max(0,Math.min(sections.length-1,i));persistDraft();render();window.scrollTo({top:0,behavior:"smooth"})}
+            const handleEditHall = (hall) => {
+                setActiveHall(hall);
+                setCurrentView('detail');
+            };
 
-function setv(k,v){state.values[k]=v;persistDraft();render()}
-function persistDraft(){
- localStorage.setItem("weddingDraftV1",JSON.stringify(state));
-}
-function saveCurrent(){
- if(!state.hallName.trim()){toast("먼저 웨딩홀 이름을 입력해주세요.");return}
- const obj={...state,updated:new Date().toISOString()};
- const idx=db.findIndex(x=>x.id===state.id);
- if(idx>=0) db[idx]=obj; else {obj.id=uuid();state.id=obj.id;db.push(obj)}
- localStorage.setItem("weddingHallsV1",JSON.stringify(db));
- persistDraft(); toast("저장했습니다 ✓");
-}
-function nextSection(){saveCurrent(); if(state.section<sections.length-1){state.section++;render();window.scrollTo({top:0,behavior:"smooth"})}else{openList()}}
-function prevSection(){if(state.section>0){state.section--;render();window.scrollTo({top:0,behavior:"smooth"})}}
-function openList(){renderList();document.getElementById("modal").classList.add("open")}
-function closeList(){document.getElementById("modal").classList.remove("open")}
-function renderList(){
- const el=document.getElementById("hallList");
- if(!db.length){el.innerHTML='<div class="hint">저장된 웨딩홀이 없습니다.</div>';return}
- el.innerHTML=db.map(x=>`<div class="hall-card"><b>${esc(x.hallName||"이름 없음")}</b><div class="hint">${new Date(x.updated||Date.now()).toLocaleString("ko-KR")}</div><div class="row"><button onclick="loadHall('${x.id}')">열기</button><button onclick="duplicateHall('${x.id}')">복제</button><button onclick="deleteHall('${x.id}')">삭제</button></div></div>`).join("");
-}
-function loadHall(id){const x=db.find(x=>x.id===id);if(!x)return;state=JSON.parse(JSON.stringify(x));state.section=0;persistDraft();closeList();render()}
-function newHall(){state={id:null,hallName:"",values:{},section:0};persistDraft();closeList();render()}
-function duplicateHall(id){const x=db.find(x=>x.id===id);if(!x)return;state=JSON.parse(JSON.stringify(x));state.id=null;state.hallName=(x.hallName||"")+" (복사본)";saveCurrent();renderList()}
-function deleteHall(id){if(confirm("이 웨딩홀을 삭제할까요?")){db=db.filter(x=>x.id!==id);localStorage.setItem("weddingHallsV1",JSON.stringify(db));renderList()}}
-function exportAll(){
- const blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"});
- const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="웨딩홀투어_백업.json";a.click();URL.revokeObjectURL(a.href);
-}
-function importData(){
- const input=document.createElement("input");input.type="file";input.accept=".json";
- input.onchange=()=>{const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!Array.isArray(x))throw 0;db=x;localStorage.setItem("weddingHallsV1",JSON.stringify(db));renderList();toast("백업을 불러왔습니다.")}catch(e){toast("백업 파일을 읽지 못했습니다.")}};r.readAsText(input.files[0])};input.click()
-}
-function clearAll(){if(confirm("모든 저장 데이터를 삭제할까요?")){db=[];localStorage.removeItem("weddingHallsV1");localStorage.removeItem("weddingDraftV1");renderList()}}
-function toast(t){const e=document.getElementById("toast");e.textContent=t;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),1500)}
-document.addEventListener("visibilitychange",()=>{if(document.hidden)persistDraft()});
-const draft=localStorage.getItem("weddingDraftV1"); if(draft){try{state=JSON.parse(draft)}catch(e){}}
-render();
-if("serviceWorker" in navigator) navigator.serviceWorker.register("service-worker.js").catch(()=>{});
-</script>
+            const handleDelete = (id) => {
+                if(window.confirm('정말 삭제하시겠습니까?')) {
+                    const updatedHalls = halls.filter(h => h.id !== id);
+                    setHalls(updatedHalls);
+                    saveToLocal(updatedHalls);
+                }
+            };
+
+            const handleChange = (e) => {
+                const { name, value, type, checked } = e.target;
+                setActiveHall({
+                    ...activeHall,
+                    [name]: type === 'checkbox' ? checked : value
+                });
+            };
+
+            const handleSave = () => {
+                if(!activeHall.name) {
+                    alert('웨딩홀 이름을 입력해주세요.');
+                    return;
+                }
+                
+                let updatedHalls;
+                const exists = halls.find(h => h.id === activeHall.id);
+                if (exists) {
+                    updatedHalls = halls.map(h => h.id === activeHall.id ? activeHall : h);
+                } else {
+                    updatedHalls = [...halls, activeHall];
+                }
+                
+                setHalls(updatedHalls);
+                saveToLocal(updatedHalls);
+                setCurrentView('list');
+            };
+
+            if (currentView === 'list') {
+                return (
+                    <div className="max-w-md mx-auto min-h-screen bg-gray-50 pb-20">
+                        <header className="bg-pink-500 text-white p-4 sticky top-0 z-10 shadow-md">
+                            <h1 className="text-xl font-bold text-center">우리의 웨딩홀 투어 💍</h1>
+                        </header>
+                        
+                        <div className="p-4 space-y-4">
+                            {halls.length === 0 ? (
+                                <div className="text-center text-gray-500 py-10">
+                                    <p>아직 등록된 웨딩홀이 없습니다.</p>
+                                    <p>아래 버튼을 눌러 투어 기록을 시작하세요!</p>
+                                </div>
+                            ) : (
+                                halls.map(hall => (
+                                    <div key={hall.id} className="bg-white p-4 rounded-xl shadow border border-gray-100">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <h2 className="text-lg font-bold text-gray-800">{hall.name}</h2>
+                                            <span className="text-sm text-pink-500 font-semibold">{hall.rating}점</span>
+                                        </div>
+                                        <div className="text-sm text-gray-600 mb-4 space-y-1">
+                                            <p>📅 {hall.tourDate || '날짜 미지정'}</p>
+                                            <p>💰 총 견적: {hall.totalEstimate ? Number(hall.totalEstimate).toLocaleString() + '원' : '미입력'}</p>
+                                        </div>
+                                        <div className="flex space-x-2">
+                                            <button onClick={() => handleEditHall(hall)} className="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg font-medium">수정/보기</button>
+                                            <button onClick={() => handleDelete(hall.id)} className="px-4 bg-red-50 text-red-500 py-2 rounded-lg font-medium">삭제</button>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+
+                        <button 
+                            onClick={handleAddHall}
+                            className="fixed bottom-6 right-6 w-14 h-14 bg-pink-500 text-white rounded-full shadow-lg text-3xl flex items-center justify-center hover:bg-pink-600 transition"
+                        >
+                            +
+                        </button>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="max-w-md mx-auto min-h-screen bg-white">
+                    <header className="bg-pink-500 text-white p-4 sticky top-0 z-10 shadow-md flex justify-between items-center">
+                        <button onClick={() => setCurrentView('list')} className="font-bold">← 뒤로</button>
+                        <h1 className="text-lg font-bold">{activeHall.name ? activeHall.name : '새 웨딩홀 기록'}</h1>
+                        <button onClick={handleSave} className="font-bold">저장</button>
+                    </header>
+
+                    <div className="p-4 space-y-6">
+                        {/* 기본 정보 */}
+                        <section>
+                            <h3 className="text-pink-600 font-bold border-b border-pink-100 pb-2 mb-3">📌 기본 정보</h3>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">웨딩홀 이름 *</label>
+                                <input type="text" name="name" value={activeHall.name} onChange={handleChange} className="input-field" placeholder="예: 더채플앳논현" />
+                            </div>
+                            <div className="mt-3">
+                                <label className="block text-sm font-medium text-gray-700">투어 날짜</label>
+                                <input type="date" name="tourDate" value={activeHall.tourDate} onChange={handleChange} className="input-field" />
+                            </div>
+                        </section>
+
+                        {/* 위치 및 주차 */}
+                        <section>
+                            <h3 className="text-pink-600 font-bold border-b border-pink-100 pb-2 mb-3">🚗 위치 & 주차</h3>
+                            <div className="space-y-3">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">대중교통 접근성</label>
+                                    <input type="text" name="subway" value={activeHall.subway} onChange={handleChange} className="input-field" placeholder="예: 9호선 언주역 도보 5분" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">주차 대수 및 시간</label>
+                                    <input type="text" name="parkingCapacity" value={activeHall.parkingCapacity} onChange={handleChange} className="input-field" placeholder="예: 500대 / 하객 2시간 무료" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">발렛/ATM 등 편의시설</label>
+                                    <input type="text" name="atmInfo" value={activeHall.atmInfo} onChange={handleChange} className="input-field" placeholder="예: 1층에 ATM 있음" />
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* 홀 컨디션 */}
+                        <section>
+                            <h3 className="text-pink-600 font-bold border-b border-pink-100 pb-2 mb-3">✨ 홀 분위기 & 동선</h3>
+                            <div className="space-y-3">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">홀 느낌</label>
+                                    <input type="text" name="hallType" value={activeHall.hallType} onChange={handleChange} className="input-field" placeholder="예: 어두운 컨벤션, 채플, 하우스" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">천고 / 좌석 수</label>
+                                    <input type="text" name="seatCount" value={activeHall.seatCount} onChange={handleChange} className="input-field" placeholder="예: 천고 높음 / 200석" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">신부대기실 (화장실, 동선)</label>
+                                    <input type="text" name="bridalRoom" value={activeHall.bridalRoom} onChange={handleChange} className="input-field" placeholder="예: 화장실 있음, 홀과 바로 연결" />
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* 식사 */}
+                        <section>
+                            <h3 className="text-pink-600 font-bold border-b border-pink-100 pb-2 mb-3">🍽️ 식사 (연회장)</h3>
+                            <div className="space-y-3">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">식사 종류</label>
+                                    <input type="text" name="foodType" value={activeHall.foodType} onChange={handleChange} className="input-field" placeholder="예: 뷔페 120종" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">연회장 크기 및 이용시간</label>
+                                    <input type="text" name="diningRoomCapacity" value={activeHall.diningRoomCapacity} onChange={handleChange} className="input-field" placeholder="예: 700석 / 2시간" />
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* 견적 */}
+                        <section>
+                            <h3 className="text-pink-600 font-bold border-b border-pink-100 pb-2 mb-3">💰 견적 (비용)</h3>
+                            <div className="space-y-3">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">보증 인원</label>
+                                    <input type="number" name="guarantee" value={activeHall.guarantee} onChange={handleChange} className="input-field" placeholder="예: 250" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">식대 (할인가 기준)</label>
+                                    <input type="number" name="foodPrice" value={activeHall.foodPrice} onChange={handleChange} className="input-field" placeholder="숫자만 입력 (예: 65000)" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">대관료 (생화장출 등 포함)</label>
+                                    <input type="number" name="rentalFee" value={activeHall.rentalFee} onChange={handleChange} className="input-field" placeholder="숫자만 입력 (예: 3000000)" />
+                                </div>
+                                <div className="bg-pink-50 p-3 rounded-lg border border-pink-200">
+                                    <label className="block text-sm font-bold text-pink-700">최종 견적 (대략)</label>
+                                    <input type="number" name="totalEstimate" value={activeHall.totalEstimate} onChange={handleChange} className="input-field bg-white" placeholder="자동계산 또는 직접입력" />
+                                    <p className="text-xs text-gray-500 mt-1">* 참고: (보증인원 x 식대) + 대관료 = {(activeHall.guarantee * activeHall.foodPrice) + Number(activeHall.rentalFee)}원</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">당일 혜택 및 특이사항</label>
+                                    <textarea name="perks" value={activeHall.perks} onChange={handleChange} className="input-field" rows="2" placeholder="예: 당일 계약 시 식대 2천원 할인, 전문 사회자 서비스"></textarea>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* 총평 */}
+                        <section className="pb-10">
+                            <h3 className="text-pink-600 font-bold border-b border-pink-100 pb-2 mb-3">📝 총평</h3>
+                            <div className="space-y-3">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">내 마음속 평점 (1~5)</label>
+                                    <input type="number" name="rating" min="1" max="5" value={activeHall.rating} onChange={handleChange} className="input-field" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">개인적인 장단점 / 메모</label>
+                                    <textarea name="notes" value={activeHall.notes} onChange={handleChange} className="input-field" rows="4" placeholder="예: 홀은 예쁜데 주차가 헬이다. 밥은 맛있어보임."></textarea>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
 </body>
 </html>
